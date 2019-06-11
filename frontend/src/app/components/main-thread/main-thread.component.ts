@@ -43,7 +43,7 @@ export class MainThreadComponent implements OnInit, OnDestroy {
         private imgurService: ImgurService,
         private authDialogService: AuthDialogService,
         private eventService: EventService
-    ) {}
+    ) { }
 
     public ngOnDestroy() {
         this.unsubscribe$.next();
@@ -60,6 +60,7 @@ export class MainThreadComponent implements OnInit, OnDestroy {
             this.currentUser = user;
             this.post.authorId = this.currentUser ? this.currentUser.id : undefined;
         });
+
     }
 
     public getPosts() {
@@ -80,11 +81,11 @@ export class MainThreadComponent implements OnInit, OnDestroy {
         const postSubscription = !this.imageFile
             ? this.postService.createPost(this.post)
             : this.imgurService.uploadToImgur(this.imageFile, 'title').pipe(
-                  switchMap((imageData) => {
-                      this.post.previewImage = imageData.body.data.link;
-                      return this.postService.createPost(this.post);
-                  })
-              );
+                switchMap((imageData) => {
+                    this.post.previewImage = imageData.body.data.link;
+                    return this.postService.createPost(this.post);
+                })
+            );
 
         this.loading = true;
 
@@ -133,7 +134,20 @@ export class MainThreadComponent implements OnInit, OnDestroy {
             this.posts = this.cachedPosts;
         }
     }
+    public removeOnePost(ev: Post) {
+        if (ev.author.id != this.currentUser.id) return;
+        this.postService.deletePost(ev).pipe(takeUntil(this.unsubscribe$))
+            .subscribe(
+                (resp) => {
+                    console.log(resp);
+                    this.cachedPosts = this.cachedPosts.filter((x) => x.id != ev.id);
+                    this.posts = this.cachedPosts;
 
+                },
+                (error) => console.log(error)
+            );
+
+    }
     public toggleNewPostContainer() {
         this.showPostContainer = !this.showPostContainer;
     }
@@ -143,7 +157,7 @@ export class MainThreadComponent implements OnInit, OnDestroy {
     }
 
     public registerHub() {
-        this.postHub = new HubConnectionBuilder().withUrl('https://localhost:44344/notifications/post').build();
+        this.postHub = new HubConnectionBuilder().withUrl('https://localhost:5001/notifications/post').build();
         this.postHub.start().catch((error) => this.snackBarService.showErrorMessage(error));
 
         this.postHub.on('NewPost', (newPost: Post) => {

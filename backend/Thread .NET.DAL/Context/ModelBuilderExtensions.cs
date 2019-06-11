@@ -41,6 +41,7 @@ namespace Thread_.NET.DAL.Context
                 .HasMany(p => p.Reactions)
                 .WithOne(r => r.Post)
                 .HasForeignKey(r => r.PostId);
+                
 
             modelBuilder.Entity<Comment>()
                 .HasMany(p => p.Reactions)

@@ -20,6 +20,9 @@
       <mat-icon matBadge="{{post.comments.length}}" matBadgeColor="warn" matBadgeSize="medium"
         [matBadgeHidden]="post.comments.length === 0" aria-label="Add comment">comment</mat-icon>
     </button>
+    <button mat-icon-button color="accent" *ngIf="isOwnPost">
+      <mat-icon aria-label="close" (click)="deletePost()">close</mat-icon>
+    </button>
   </mat-card-actions>
   <div *ngIf="showComments">
     <mat-divider></mat-divider>
