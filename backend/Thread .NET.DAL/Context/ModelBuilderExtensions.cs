@@ -15,6 +15,9 @@ namespace Thread_.NET.DAL.Context
 
         public static void Configure(this ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Post>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<Comment>().HasQueryFilter(c => !c.IsDeleted);
+
             modelBuilder.Entity<RefreshToken>().Ignore(t => t.IsActive);
 
             modelBuilder.Entity<PostReaction>()

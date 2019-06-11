@@ -64,10 +64,10 @@ namespace Thread_.NET.BLL.Services
             {
                 throw new NotFoundException(nameof(Post), id);
             }
-            var likes = _context.PostReactions.Where(l => l.PostId == postEntity.Id);
-            var comments = _context.Comments.Where(c => c.PostId == postEntity.Id);
-            _context.RemoveRange(likes);
-             _context.RemoveRange(comments);
+            // var likes = _context.PostReactions.Where(l => l.PostId == postEntity.Id);
+            // var comments = _context.Comments.Where(c => c.PostId == postEntity.Id);
+            // _context.RemoveRange(likes);
+            //  _context.RemoveRange(comments);
             _context.Posts.Remove(postEntity);
             await _context.SaveChangesAsync();
         }
