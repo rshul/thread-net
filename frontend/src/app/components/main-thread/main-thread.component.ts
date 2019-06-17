@@ -60,6 +60,11 @@ export class MainThreadComponent implements OnInit, OnDestroy {
             this.currentUser = user;
             this.post.authorId = this.currentUser ? this.currentUser.id : undefined;
         });
+        
+        this.eventService.commentDeletedEvent$.pipe(takeUntil(this.unsubscribe$)).subscribe((commentInPost) => {
+            let selectedPost = this.posts.find(post => post.id == commentInPost.post.id);
+            selectedPost.comments = selectedPost.comments.filter(comment => comment.id != commentInPost.comment.id);
+        });
 
     }
 
