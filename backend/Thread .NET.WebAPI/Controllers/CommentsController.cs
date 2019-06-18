@@ -25,5 +25,11 @@ namespace Thread_.NET.WebAPI.Controllers
             comment.AuthorId = this.GetUserIdFromToken();
             return Ok(await _commentService.CreateComment(comment));
         }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteComment(int id)
+        {
+            await this._commentService.DeleteCommentAsync(id);
+            return NoContent();
+        }
     }
 }

@@ -1,3 +1,4 @@
+import { CommentComponent } from './../comment/comment.component';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Post } from 'src/app/models/post/post';
 import { User } from 'src/app/models/user';
@@ -13,6 +14,7 @@ import { NewPost } from 'src/app/models/post/new-post';
 import { switchMap, takeUntil } from 'rxjs/operators';
 import { HubConnectionBuilder, HubConnection } from '@aspnet/signalr';
 import { SnackBarService } from 'src/app/services/snack-bar.service';
+import { CommentService } from 'src/app/services/comment.service';
 
 @Component({
     selector: 'app-main-thread',
@@ -40,6 +42,7 @@ export class MainThreadComponent implements OnInit, OnDestroy {
         private snackBarService: SnackBarService,
         private authService: AuthenticationService,
         private postService: PostService,
+        private commentService: CommentService,
         private imgurService: ImgurService,
         private authDialogService: AuthDialogService,
         private eventService: EventService
@@ -60,10 +63,9 @@ export class MainThreadComponent implements OnInit, OnDestroy {
             this.currentUser = user;
             this.post.authorId = this.currentUser ? this.currentUser.id : undefined;
         });
-        
+
         this.eventService.commentDeletedEvent$.pipe(takeUntil(this.unsubscribe$)).subscribe((commentInPost) => {
-            let selectedPost = this.posts.find(post => post.id == commentInPost.post.id);
-            selectedPost.comments = selectedPost.comments.filter(comment => comment.id != commentInPost.comment.id);
+            this.removeOneComment(commentInPost);
         });
 
     }
@@ -139,6 +141,7 @@ export class MainThreadComponent implements OnInit, OnDestroy {
             this.posts = this.cachedPosts;
         }
     }
+
     public removeOnePost(ev: Post) {
         if (ev.author.id != this.currentUser.id) return;
         this.postService.deletePost(ev).pipe(takeUntil(this.unsubscribe$))
@@ -148,6 +151,18 @@ export class MainThreadComponent implements OnInit, OnDestroy {
                     this.cachedPosts = this.cachedPosts.filter((x) => x.id != ev.id);
                     this.posts = this.cachedPosts;
 
+                },
+                (error) => console.log(error)
+            );
+
+    }
+    public removeOneComment(comment: CommentComponent) {
+        this.commentService.deleteComment(comment.comment).pipe(takeUntil(this.unsubscribe$))
+            .subscribe(
+                (resp) => {
+                    console.log(resp);
+                    let selectedPost = this.posts.find(post => post.id == comment.post.id);
+                    selectedPost.comments = selectedPost.comments.filter(c => c.id != comment.comment.id);
                 },
                 (error) => console.log(error)
             );

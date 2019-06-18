@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using Thread_.NET.BLL.Exceptions;
 using Thread_.NET.BLL.Services.Abstract;
 using Thread_.NET.Common.DTO.Comment;
 using Thread_.NET.DAL.Context;
@@ -25,6 +26,17 @@ namespace Thread_.NET.BLL.Services
                 .FirstAsync(comment => comment.Id == commentEntity.Id);
 
             return _mapper.Map<CommentDTO>(createdComment);
+        }
+
+        public async Task DeleteCommentAsync(int id)
+        {
+            var commentEntity = await _context.Comments.FirstOrDefaultAsync(c => c.Id == id);
+            if(commentEntity == null)
+            {
+                throw new NotFoundException(nameof(commentEntity), id);
+            }
+            _context.Comments.Remove(commentEntity);
+            await _context.SaveChangesAsync();
         }
     }
 }

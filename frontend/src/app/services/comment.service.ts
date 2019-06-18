@@ -7,9 +7,12 @@ import { Comment } from '../models/comment/comment';
 export class CommentService {
     public routePrefix = '/api/comments';
 
-    constructor(private httpService: HttpInternalService) {}
+    constructor(private httpService: HttpInternalService) { }
 
     public createComment(post: NewComment) {
         return this.httpService.postFullRequest<Comment>(`${this.routePrefix}`, post);
+    }
+    public deleteComment(comment: Comment) {
+        return this.httpService.deleteFullRequest(`${this.routePrefix}/${comment.id}`);
     }
 }
