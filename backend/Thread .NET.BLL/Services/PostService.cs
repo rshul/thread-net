@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Thread_.NET.BLL.Exceptions;
 using Thread_.NET.BLL.Hubs;
 using Thread_.NET.BLL.Services.Abstract;
 using Thread_.NET.Common.DTO.Post;
@@ -51,6 +54,18 @@ namespace Thread_.NET.BLL.Services
                 .ToListAsync();
 
             return _mapper.Map<ICollection<PostDTO>>(posts);
+        }
+
+        public async Task DeletePostAsync(int id)
+        {
+            Console.WriteLine($"---------------------Deleting!!!!postid{id}---------------");
+            var postEntity = await _context.Posts.FirstOrDefaultAsync(p => p.Id == id);
+            if (postEntity == null)
+            {
+                throw new NotFoundException(nameof(Post), id);
+            }
+            _context.Posts.Remove(postEntity);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<PostDTO> CreatePost(PostCreateDTO postDto)

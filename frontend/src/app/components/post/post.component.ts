@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, OnChanges, EventEmitter, Output } from '@angular/core';
 import { Post } from 'src/app/models/post/post';
 import { AuthenticationService } from 'src/app/services/auth.service';
 import { AuthDialogService } from 'src/app/services/auth-dialog.service';
@@ -17,12 +17,14 @@ import { SnackBarService } from 'src/app/services/snack-bar.service';
     templateUrl: './post.component.html',
     styleUrls: ['./post.component.sass']
 })
-export class PostComponent implements OnDestroy {
+export class PostComponent implements OnDestroy, OnChanges {
+
     @Input() public post: Post;
     @Input() public currentUser: User;
-
+    @Output() postDeletion = new EventEmitter<Post>();
     public showComments = false;
     public newComment = {} as NewComment;
+    public isOwnPost;
 
     private unsubscribe$ = new Subject<void>();
 
@@ -32,11 +34,21 @@ export class PostComponent implements OnDestroy {
         private likeService: LikeService,
         private commentService: CommentService,
         private snackBarService: SnackBarService
-    ) {}
-
+    ) { }
+    
+    public ngOnChanges(): void {
+        if (this.currentUser) {
+            this.isOwnPost = this.post.author.id == this.currentUser.id;
+        } else {
+            this.isOwnPost = false;
+        }
+    }
     public ngOnDestroy() {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
+    }
+    public deletePost() {
+        this.postDeletion.emit(this.post);
     }
 
     public toggleComments() {

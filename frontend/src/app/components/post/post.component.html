@@ -20,6 +20,9 @@
       <mat-icon matBadge="{{post.comments.length}}" matBadgeColor="warn" matBadgeSize="medium"
         [matBadgeHidden]="post.comments.length === 0" aria-label="Add comment">comment</mat-icon>
     </button>
+    <button mat-icon-button color="accent" *ngIf="isOwnPost">
+      <mat-icon aria-label="close" (click)="deletePost()">close</mat-icon>
+    </button>
   </mat-card-actions>
   <div *ngIf="showComments">
     <mat-divider></mat-divider>
@@ -34,6 +37,6 @@
     <div *ngIf="post.comments.length > 0" class="comments-count">
       Just {{post.comments.length}} in all
     </div>
-    <app-comment *ngFor="let _comment of post.comments" [comment]="_comment"></app-comment>
+    <app-comment *ngFor="let _comment of post.comments" [comment]="_comment" [currentUser]="currentUser" [post]="post"></app-comment>
   </div>
 </mat-card>
