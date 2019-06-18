@@ -35,6 +35,7 @@ export class PostComponent implements OnDestroy, OnChanges {
         private commentService: CommentService,
         private snackBarService: SnackBarService
     ) { }
+    
     public ngOnChanges(): void {
         if (this.currentUser) {
             this.isOwnPost = this.post.author.id == this.currentUser.id;
